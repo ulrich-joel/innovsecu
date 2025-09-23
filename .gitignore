@@ -1,0 +1,16 @@
+# Exclure les environnements virtuels
+venv/
+
+# Exclure les fichiers temporaires
+*.log
+*.pt
+*.pyc
+__pycache__/
+
+# Exclure les données brutes et traitées
+data/raw/
+data/processed/
+
+# Exclure les checkpoints et modèles
+checkpoints/
+bert_model/

@@ -1,0 +1,194 @@
+[2025-06-23 16:14:25] 🧪 Chargement des données de validation...
+[2025-06-23 16:15:14] 📂 Rechargement du modèle existant...
+[2025-06-23 16:18:09] 🧪 Chargement des données de validation...
+[2025-06-23 16:18:54] 📥 Chargement d'un nouveau modèle BERT...
+[2025-06-23 16:18:56] 
+📦 Début de l'entraînement sur shard 1/26 : tokenized_data_0.pt
+[2025-06-23 19:49:50] 📉 Perte moyenne sur shard 1: 0.1448
+[2025-06-23 19:49:52] 💾 Modèle et état sauvegardés après shard 1
+[2025-06-23 23:10:49] 🧪 Chargement des données de validation...
+[2025-06-23 23:11:40] 📥 Chargement d'un nouveau modèle BERT...
+[2025-06-23 23:11:42] 
+📦 Début de l'entraînement sur shard 2/26 : tokenized_data_1.pt
+[2025-06-24 02:42:21] 📉 Perte moyenne sur shard 2: 0.0144
+[2025-06-24 02:42:23] 💾 Modèle et état sauvegardés après shard 2
+[2025-06-24 03:02:21] ⚠️ Évaluation interrompue manuellement après entraînement.
+[2025-06-24 03:02:21] ⚠️ Reprise possible au prochain shard sans problème.
+[2025-06-24 03:02:42] 🧪 Chargement des données de validation...
+[2025-06-24 03:03:24] 📥 Chargement d'un nouveau modèle BERT...
+[2025-06-24 03:03:27] 
+📦 Début de l'entraînement sur shard 3/26 : tokenized_data_10.pt
+[2025-06-24 06:51:08] 📉 Perte moyenne sur shard 3: 0.0348
+[2025-06-24 06:51:12] 💾 Modèle et état sauvegardés après shard 3
+[2025-06-24 09:18:12] ⚠️ Évaluation interrompue manuellement après entraînement.
+[2025-06-24 09:18:12] ⚠️ Reprise possible au prochain shard sans problème.
+[2025-06-24 09:19:28] 🧪 Chargement des données de validation...
+[2025-06-24 09:20:01] 📥 Chargement d'un nouveau modèle BERT...
+[2025-06-24 09:20:24] 
+📦 Début de l'entraînement sur shard 4/26 : tokenized_data_11.pt
+[2025-06-24 13:04:49] 📉 Perte moyenne sur shard 4: 0.0608
+[2025-06-24 13:04:51] 💾 Modèle et état sauvegardés après shard 4
+[2025-06-24 13:26:50] ⚠️ Évaluation interrompue manuellement après entraînement.
+[2025-06-24 13:26:50] ⚠️ Reprise possible au prochain shard sans problème.
+[2025-06-24 13:56:11] 🧪 Chargement des données de validation...
+[2025-06-24 13:56:52] ⚠️ Erreur lors du chargement local : 
+[2025-06-24 13:56:52] 📥 Téléchargement du modèle BERT de base...
+[2025-06-24 13:56:57] 
+📦 Début de l'entraînement sur shard 5/26 : tokenized_data_12.pt
+[2025-06-24 17:34:38] 📉 Perte moyenne sur shard 5: 0.0877
+[2025-06-24 17:34:40] 💾 Modèle et état sauvegardés après shard 5
+[2025-06-24 17:34:40] 
+📦 Début de l'entraînement sur shard 6/26 : tokenized_data_13.pt
+[2025-06-24 21:17:53] 📉 Perte moyenne sur shard 6: 0.0306
+[2025-06-24 21:17:55] 💾 Modèle et état sauvegardés après shard 6
+[2025-06-24 21:17:55] 
+📦 Début de l'entraînement sur shard 7/26 : tokenized_data_14.pt
+[2025-06-25 00:59:39] 📉 Perte moyenne sur shard 7: 0.0081
+[2025-06-25 00:59:43] 💾 Modèle et état sauvegardés après shard 7
+[2025-06-25 00:59:43] 
+📦 Début de l'entraînement sur shard 8/26 : tokenized_data_15.pt
+[2025-06-25 04:42:55] 📉 Perte moyenne sur shard 8: 0.0078
+[2025-06-25 04:42:59] 💾 Modèle et état sauvegardés après shard 8
+[2025-06-25 04:42:59] 
+📦 Début de l'entraînement sur shard 9/26 : tokenized_data_16.pt
+[2025-06-25 08:26:49] 📉 Perte moyenne sur shard 9: 0.0064
+[2025-06-25 08:26:53] 💾 Modèle et état sauvegardés après shard 9
+[2025-06-25 08:26:53] 
+📦 Début de l'entraînement sur shard 10/26 : tokenized_data_17.pt
+[2025-06-25 12:10:02] 📉 Perte moyenne sur shard 10: 0.4537
+[2025-06-25 12:10:05] 💾 Modèle et état sauvegardés après shard 10
+[2025-06-25 12:10:05] 
+📦 Début de l'entraînement sur shard 11/26 : tokenized_data_18.pt
+[2025-06-25 16:01:40] 📉 Perte moyenne sur shard 11: 0.0959
+[2025-06-25 16:01:45] 💾 Modèle et état sauvegardés après shard 11
+[2025-06-25 16:01:45] 
+📦 Début de l'entraînement sur shard 12/26 : tokenized_data_19.pt
+[2025-06-25 20:12:55] 🧪 Chargement des données de validation...
+[2025-06-25 20:13:35] ⚠️ Erreur lors du chargement local : 
+[2025-06-25 20:13:35] 📥 Téléchargement du modèle BERT de base...
+[2025-06-25 20:13:38] 
+📦 Début de l'entraînement sur shard 12/26 : tokenized_data_19.pt
+[2025-06-25 20:43:15] 🧪 Chargement des données de validation...
+[2025-06-25 20:43:53] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-25 20:43:55] 
+📦 Début de l'entraînement sur shard 12/26 : tokenized_data_19.pt
+[2025-06-26 00:23:41] 📉 Perte moyenne sur shard 12: 0.0014
+[2025-06-26 00:23:42] 💾 Modèle et état sauvegardés après shard 12
+[2025-06-26 00:23:42] 
+📦 Début de l'entraînement sur shard 13/26 : tokenized_data_2.pt
+[2025-06-26 04:08:53] 📉 Perte moyenne sur shard 13: 0.0083
+[2025-06-26 04:08:56] 💾 Modèle et état sauvegardés après shard 13
+[2025-06-26 04:08:56] 
+📦 Début de l'entraînement sur shard 14/26 : tokenized_data_20.pt
+[2025-06-26 07:55:16] 📉 Perte moyenne sur shard 14: 0.0169
+[2025-06-26 07:55:19] 💾 Modèle et état sauvegardés après shard 14
+[2025-06-26 07:55:19] 
+📦 Début de l'entraînement sur shard 15/26 : tokenized_data_21.pt
+[2025-06-26 11:44:30] 📉 Perte moyenne sur shard 15: 0.0001
+[2025-06-26 11:44:33] 💾 Modèle et état sauvegardés après shard 15
+[2025-06-26 11:44:33] 
+📦 Début de l'entraînement sur shard 16/26 : tokenized_data_22.pt
+[2025-06-26 15:30:10] 📉 Perte moyenne sur shard 16: 0.5970
+[2025-06-26 15:30:14] 💾 Modèle et état sauvegardés après shard 16
+[2025-06-26 15:30:14] 
+📦 Début de l'entraînement sur shard 17/26 : tokenized_data_23.pt
+[2025-06-26 19:17:58] 📉 Perte moyenne sur shard 17: 0.6700
+[2025-06-26 19:18:00] 💾 Modèle et état sauvegardés après shard 17
+[2025-06-26 19:18:00] 
+📦 Début de l'entraînement sur shard 18/26 : tokenized_data_24.pt
+[2025-06-26 23:06:50] 📉 Perte moyenne sur shard 18: 0.6730
+[2025-06-26 23:06:55] 💾 Modèle et état sauvegardés après shard 18
+[2025-06-26 23:06:55] 
+📦 Début de l'entraînement sur shard 19/26 : tokenized_data_25.pt
+[2025-06-27 00:17:32] 🧪 Chargement des données de validation...
+[2025-06-27 00:18:08] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-27 00:41:26] 🧪 Chargement des données de validation...
+[2025-06-27 00:42:01] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-27 00:45:39] 🧪 Chargement des données de validation...
+[2025-06-27 00:46:10] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-27 00:59:11] 🧪 Chargement des données de validation...
+[2025-06-27 00:59:47] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-27 00:59:49] 
+📦 Début de l'entraînement sur shard 19/26 : tokenized_data_25.pt
+[2025-06-27 01:16:36] 🧪 Chargement des données de validation...
+[2025-06-27 01:17:08] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-27 01:17:09] 🧲 15 shard(s) à entraîner restants : ['tokenized_data_0.pt', 'tokenized_data_10.pt', 'tokenized_data_11.pt', 'tokenized_data_12.pt', 'tokenized_data_13.pt', 'tokenized_data_14.pt', 'tokenized_data_15.pt', 'tokenized_data_16.pt', 'tokenized_data_17.pt', 'tokenized_data_4.pt', 'tokenized_data_5.pt', 'tokenized_data_6.pt', 'tokenized_data_7.pt', 'tokenized_data_8.pt', 'tokenized_data_9.pt']
+[2025-06-27 01:17:09] 
+📦 Début de l'entraînement sur shard 19/33 : tokenized_data_0.pt
+[2025-06-27 04:54:48] 📉 Perte moyenne sur shard 19: 0.5647
+[2025-06-27 04:54:51] 🗕️ Modèle et état sauvegardés après shard 19
+[2025-06-27 04:54:51] 
+📦 Début de l'entraînement sur shard 20/33 : tokenized_data_10.pt
+[2025-06-27 08:40:57] 📉 Perte moyenne sur shard 20: 0.6914
+[2025-06-27 08:41:00] 🗕️ Modèle et état sauvegardés après shard 20
+[2025-06-27 08:41:00] 
+📦 Début de l'entraînement sur shard 21/33 : tokenized_data_11.pt
+[2025-06-27 12:25:03] 📉 Perte moyenne sur shard 21: 0.5363
+[2025-06-27 12:25:04] 🗕️ Modèle et état sauvegardés après shard 21
+[2025-06-27 12:25:04] 
+📦 Début de l'entraînement sur shard 22/33 : tokenized_data_12.pt
+[2025-06-27 16:18:00] 📉 Perte moyenne sur shard 22: 0.0696
+[2025-06-27 16:18:04] 🗕️ Modèle et état sauvegardés après shard 22
+[2025-06-27 16:18:04] 
+📦 Début de l'entraînement sur shard 23/33 : tokenized_data_13.pt
+[2025-06-27 20:09:58] 📉 Perte moyenne sur shard 23: 0.0148
+[2025-06-27 20:10:03] 🗕️ Modèle et état sauvegardés après shard 23
+[2025-06-27 20:10:03] 
+📦 Début de l'entraînement sur shard 24/33 : tokenized_data_14.pt
+[2025-06-27 23:55:13] 📉 Perte moyenne sur shard 24: 0.0196
+[2025-06-27 23:55:18] 🗕️ Modèle et état sauvegardés après shard 24
+[2025-06-27 23:55:18] 
+📦 Début de l'entraînement sur shard 25/33 : tokenized_data_15.pt
+[2025-06-28 03:31:45] 📉 Perte moyenne sur shard 25: 0.0093
+[2025-06-28 03:31:46] 🗕️ Modèle et état sauvegardés après shard 25
+[2025-06-28 03:31:46] 
+📦 Début de l'entraînement sur shard 26/33 : tokenized_data_16.pt
+[2025-06-28 07:05:09] 📉 Perte moyenne sur shard 26: 0.0150
+[2025-06-28 07:05:11] 🗕️ Modèle et état sauvegardés après shard 26
+[2025-06-28 07:05:11] 
+📦 Début de l'entraînement sur shard 27/33 : tokenized_data_17.pt
+[2025-06-28 10:48:52] 📉 Perte moyenne sur shard 27: 0.5096
+[2025-06-28 10:48:56] 🗕️ Modèle et état sauvegardés après shard 27
+[2025-06-28 10:48:56] 
+📦 Début de l'entraînement sur shard 28/33 : tokenized_data_4.pt
+[2025-06-28 14:24:30] 📉 Perte moyenne sur shard 28: 0.0579
+[2025-06-28 14:24:32] 🗕️ Modèle et état sauvegardés après shard 28
+[2025-06-28 14:24:32] 
+📦 Début de l'entraînement sur shard 29/33 : tokenized_data_5.pt
+[2025-06-28 18:00:16] 📉 Perte moyenne sur shard 29: 0.6956
+[2025-06-28 18:00:21] 🗕️ Modèle et état sauvegardés après shard 29
+[2025-06-28 18:00:21] 
+📦 Début de l'entraînement sur shard 30/33 : tokenized_data_6.pt
+[2025-06-28 21:51:03] 📉 Perte moyenne sur shard 30: 0.6992
+[2025-06-28 21:51:08] 🗕️ Modèle et état sauvegardés après shard 30
+[2025-06-28 21:51:08] 
+📦 Début de l'entraînement sur shard 31/33 : tokenized_data_7.pt
+[2025-06-29 01:39:01] 📉 Perte moyenne sur shard 31: 0.6964
+[2025-06-29 01:39:03] 🗕️ Modèle et état sauvegardés après shard 31
+[2025-06-29 01:39:03] 
+📦 Début de l'entraînement sur shard 32/33 : tokenized_data_8.pt
+[2025-06-29 05:11:57] 📉 Perte moyenne sur shard 32: 0.6901
+[2025-06-29 05:11:59] 🗕️ Modèle et état sauvegardés après shard 32
+[2025-06-29 05:11:59] 
+📦 Début de l'entraînement sur shard 33/33 : tokenized_data_9.pt
+[2025-06-29 08:43:43] 📉 Perte moyenne sur shard 33: 0.6935
+[2025-06-29 08:43:45] 🗕️ Modèle et état sauvegardés après shard 33
+[2025-06-29 18:15:28] 🧪 Chargement des données de validation...
+[2025-06-29 18:15:58] 📂 Rechargement du modèle existant depuis logs/ ...
+[2025-06-29 18:16:00] 🧲 4 shard(s) à entraîner restants : ['tokenized_data_26.pt', 'tokenized_data_27.pt', 'tokenized_data_28.pt', 'tokenized_data_29.pt']
+[2025-06-29 18:16:00] 
+📦 Début de l'entraînement sur shard 34/37 : tokenized_data_26.pt
+[2025-06-29 21:54:02] 📉 Perte moyenne sur shard 34: 0.4049
+[2025-06-29 21:54:04] 🗕️ Modèle et état sauvegardés après shard 34
+[2025-06-29 21:54:04] 
+📦 Début de l'entraînement sur shard 35/37 : tokenized_data_27.pt
+[2025-06-30 01:29:55] 📉 Perte moyenne sur shard 35: 0.5582
+[2025-06-30 01:30:00] 🗕️ Modèle et état sauvegardés après shard 35
+[2025-06-30 01:30:00] 
+📦 Début de l'entraînement sur shard 36/37 : tokenized_data_28.pt
+[2025-06-30 05:15:06] 📉 Perte moyenne sur shard 36: 0.3197
+[2025-06-30 05:15:10] 🗕️ Modèle et état sauvegardés après shard 36
+[2025-06-30 05:15:10] 
+📦 Début de l'entraînement sur shard 37/37 : tokenized_data_29.pt
+[2025-06-30 09:18:52] 📉 Perte moyenne sur shard 37: 0.5083
+[2025-06-30 09:18:57] 🗕️ Modèle et état sauvegardés après shard 37
