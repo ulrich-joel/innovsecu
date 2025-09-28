@@ -3,7 +3,6 @@ venv/
 
 # Exclure les fichiers temporaires
 *.log
-*.pt
 *.pyc
 __pycache__/
 
@@ -13,4 +12,19 @@ data/processed/
 
 # Exclure les checkpoints et modèles
 checkpoints/
-bert_model/
+bert_model/"output/mapped_mittre/dynamic_mitre_mapped.csv" 
+"output/mapped_mittre/dynamic_mitre_mapped.json" 
+"output/mapped_mittre/dynamic_mitre_mapped_with_labels.json" 
+"logs/model.safetensors"
+
+# Fichiers volumineux
+temp.pt
+bert_model/model.safetensors
+output/mapped_mittre/*.csv
+output/mapped_mittre/*.json
+
+# Données générées
+data/processed/
+output/cluster_file/
+output/reports/
+logs/
