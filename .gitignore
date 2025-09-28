@@ -29,3 +29,9 @@ output/cluster_file/
 output/reports/
 logs/
 output/mapped_mittre/dynamic_mitre_mapped.csv 
+
+# Ignorer les gros fichiers modèles
+output/models/
+output/mapped_mittre/dynamic_mitre_mapped_with_labels.json
+logs/model.safetensors
+
