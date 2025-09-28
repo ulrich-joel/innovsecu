@@ -28,3 +28,4 @@ data/processed/
 output/cluster_file/
 output/reports/
 logs/
+output/mapped_mittre/dynamic_mitre_mapped.csv 
