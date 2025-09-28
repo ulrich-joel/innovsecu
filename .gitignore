@@ -35,3 +35,4 @@ output/models/
 output/mapped_mittre/dynamic_mitre_mapped_with_labels.json
 logs/model.safetensors
 
+output/mapped_mittre/dynamic_mitre_mapped.json 
