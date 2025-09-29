@@ -7,40 +7,16 @@ Ce projet vise à traiter et analyser des journaux et événements de cybersécu
 
 La structure des répertoires et des fichiers du projet est organisée comme suit :
 
-# innovsecu/
-│
-├── .gitattributes          //Configuration pour Git LFS (Large File Storage)
-├── .gitignore              //Fichiers et dossiers à exclure du suivi Git
-├── README.md               //Documentation principale du projet
-├── requirements.txt        //Dépendances nécessaires pour exécuter le projet
-├── src/                    //Code source principal
-├── data/                   //Données brutes, traitées et prêtes pour le LLM
-├── output/                 //Résultats générés (rapports, modèles, clusters)
-├── logs/                   //Journaux d'exécution et fichiers de configuration
-├── mapping/                //Fichiers de correspondance MITRE ATT&CK
-├── config/                 //Fichiers de configuration du projet
-├── bert_model/             //Modèles et fichiers associés au modèle BERT
-├── venv/                   //Environnement virtuel Python
-└── temp.pt                 //Fichier temporaire volumineux (à exclure)
+<img width="769" height="457" alt="image" src="https://github.com/user-attachments/assets/ad87b2b4-a5c4-4eeb-a8b2-23b5fe782496" />
+
 
 Détails des Répertoires
 1. src/ - Code Source
 
 Contient les scripts principaux organisés par fonctionnalité :
 
-src/
-├── clustering.py           // Implémentation du clustering avec KMeans
-├── logger.py               // Gestion des logs
-├── main.py                 // Point d'entrée principal du projet
-├── mitre_mapper.py         // Mappage des événements aux techniques MITRE ATT&CK
-├── saver.py                // Sauvegarde des résultats
-├── tokenizer.py            // Gestion des tokenizers pour les modèles
-├── fine-tuning.py          // Fine-tuning des modèles
-├── setup.py                // Script de configuration
-├── preprocessing/          // Scripts de prétraitement des données
-├── detection/              // Scripts pour la détection des anomalies
-├── evaluation/             // Scripts pour l'évaluation des modèles
-└── inference/              // Scripts pour l'inférence
+<img width="793" height="385" alt="image" src="https://github.com/user-attachments/assets/72877668-7933-43bc-8ce7-cea07fdbcb9b" />
+
 
 Exemple : clustering.py
 
@@ -54,10 +30,8 @@ Retourne un DataFrame avec les clusters assignés.
 
 Contient les données brutes, traitées et prêtes pour l'ingestion par les modèles de langage (LLMs) :
 
-data/
-├── raw/                    // Données brutes (ex. fichiers CSV)
-├── processed/              // Données nettoyées et transformées
-└── llm_ready/              // Données formatées pour les modèles LLM
+<img width="675" height="120" alt="image" src="https://github.com/user-attachments/assets/1cc7a11f-f017-4ab9-b2d9-503fa02b8814" />
+
 
 Exemple : raw/
 
@@ -75,11 +49,8 @@ processed_dynamic/: Données dynamiques nettoyées et transformées.
 
 Contient les résultats générés tels que les rapports, modèles et clusters :
 
-output/
-├── cluster_file/           // Résultats du clustering
-├── mapped_mittre/          // Fichiers mappés aux techniques MITRE
-├── models/                 // Modèles sauvegardés
-└── reports/                // Rapports générés
+<img width="652" height="152" alt="image" src="https://github.com/user-attachments/assets/62bd1110-7aa0-439a-ab47-06d55aeb176f" />
+
 
 Exemple : cluster_file/
 
@@ -97,37 +68,29 @@ dynamic_mitre_mapped_with_labels.json: Données mappées avec des labels.
 
 Contient les journaux d'exécution et les fichiers de configuration :
 
-logs/
-├── anomaly_detection.log   // Logs pour la détection d'anomalies
-├── pipeline.log            // Logs de la pipeline
-├── training_log.txt        // Logs d'entraînement des modèles
-└── model.safetensors       // Modèle sauvegardé (volumineux)
+<img width="641" height="155" alt="image" src="https://github.com/user-attachments/assets/da6c2b41-7c40-42c2-afe3-e8f8892abaad" />
+
 
 # 5. mapping/ - Correspondance MITRE
 
 Contient les fichiers de correspondance pour mapper les événements aux techniques MITRE ATT&CK :
 
-mapping/
-├── attack_enterprise.json  // Données MITRE ATT&CK
-├── mapping_mitre.json      // Fichier de correspondance
-└── gen.py                  // Script pour générer des mappings
+<img width="619" height="124" alt="image" src="https://github.com/user-attachments/assets/da3c390f-5d09-4b1c-b7ab-5ab1462ed825" />
+
 
 # 6. config/ - Configuration
 
 Contient les fichiers de configuration globaux :
 
-config/
-└── config.py               // Configuration principale du projet
+<img width="629" height="68" alt="image" src="https://github.com/user-attachments/assets/614b18a6-abe1-4a5a-8e78-3ae33d847622" />
+
 
 # 7. bert_model/ - Modèle BERT
 
 Contient les fichiers associés au modèle BERT :
 
 bert_model/
-├── config.json             // Configuration du modèle BERT
-├── model.safetensors       // Poids du modèle BERT
-├── tokenizer_config.json   // Configuration du tokenizer
-└── vocab.txt               // Vocabulaire du tokenizer
+<img width="604" height="172" alt="image" src="https://github.com/user-attachments/assets/e9fa2140-3219-4eec-b6cf-024c5f0041bc" />
 
 Installation
 Prérequis
