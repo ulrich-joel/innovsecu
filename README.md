@@ -1,132 +1,108 @@
-## Cybersecurity Data Processing Pipeline
-# Description
+# Cybersecurity Data Processing Pipeline
 
-Ce projet vise à traiter et analyser des journaux et événements de cybersécurité bruts, en les préparant pour une ingestion par des modèles de langage (LLMs). Il inclut des étapes de prétraitement, de clustering, de mappage aux techniques MITRE ATT&CK, ainsi que la préparation des données pour les modèles.
+## **Description**
+This project is designed to process and analyze raw cybersecurity logs and events, preparing them for ingestion by large language models (LLMs). The pipeline includes steps for:
+- Data preprocessing,
+- Clustering,
+- Mapping to MITRE ATT&CK techniques,
+- Preparing data for machine learning models.
 
-# Structure du Projet
+The goal is to enhance ransomware detection, prediction, and automated response, with a focus on the LockBit ransomware family.
 
-La structure des répertoires et des fichiers du projet est organisée comme suit :
+---
 
-<img width="769" height="457" alt="image" src="https://github.com/user-attachments/assets/ad87b2b4-a5c4-4eeb-a8b2-23b5fe782496" />
+## **Project Structure**
 
+The project is organized into the following directories:
 
-Détails des Répertoires
-1. src/ - Code Source
+### **1. `src/` - Source Code**
+Contains the main scripts organized by functionality:
+- **`clustering.py`**: Implements clustering using KMeans.
+- **`fine-tuning.py`**: Fine-tunes the BERT model for ransomware detection.
+- **`logger.py`**: Handles logging for the pipeline.
+- **`mitre_mapper.py`**: Maps events to MITRE ATT&CK techniques.
+- **`saver.py`**: Saves the generated results.
+- **`preprocessing/`**: Scripts for data preprocessing.
+- **`detection/`**: Scripts for anomaly detection.
+- **`evaluation/`**: Scripts for model evaluation.
 
-Contient les scripts principaux organisés par fonctionnalité :
+---
 
-<img width="793" height="385" alt="image" src="https://github.com/user-attachments/assets/72877668-7933-43bc-8ce7-cea07fdbcb9b" />
+### **2. `data/` - Data**
+Contains raw, processed, and LLM-ready data:
+- **`raw/`**: Raw data files (e.g., `data_file.csv`, `RansomwareData.csv`).
+- **`processed/`**: Cleaned and transformed data (e.g., `dynamic_for_llm.jsonl`).
 
+---
 
-Exemple : clustering.py
+### **3. `output/` - Results**
+Stores generated results such as reports, models, and clusters:
+- **`cluster_file/`**: Contains clustering results (e.g., `dynamic_clustered.csv`).
+- **`mapped_mittre/`**: Contains MITRE-mapped data (e.g., `dynamic_mitre_mapped.csv`).
 
-Utilise KMeans pour effectuer un clustering sur les données.
+---
 
-Standardise les données avant d'appliquer le clustering.
+### **4. `logs/` - Logs**
+Stores execution logs and configuration files.
 
-Retourne un DataFrame avec les clusters assignés.
+---
 
-# 2. data/ - Données
+### **5. `mapping/` - MITRE Mapping**
+Contains files for mapping events to MITRE ATT&CK techniques.
 
-Contient les données brutes, traitées et prêtes pour l'ingestion par les modèles de langage (LLMs) :
+---
 
-<img width="675" height="120" alt="image" src="https://github.com/user-attachments/assets/1cc7a11f-f017-4ab9-b2d9-503fa02b8814" />
+### **6. `config/` - Configuration**
+Contains global configuration files for the project.
 
+---
 
-Exemple : raw/
+### **7. `bert_model/` - BERT Model**
+Contains files related to the BERT model:
+- **`model.safetensors`**: Pre-trained BERT weights.
+- **`tokenizer_config.json`**: Tokenizer configuration.
 
-data_file.csv: Données brutes générales.
+---
 
-RansomwareData.csv: Données spécifiques aux ransomwares.
+## **Installation**
 
-Exemple : processed/
+### **Prerequisites**
+- Python 3.7 or higher.
+- It is recommended to use a virtual environment.
 
-dynamic_for_llm.jsonl: Données dynamiques prêtes pour le LLM.
+### **Steps**
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ulrich-joel/innovsecu.git
+   cd innovsecu
+   ```
+2. Install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-processed_dynamic/: Données dynamiques nettoyées et transformées.
+---
 
-# 3. output/ - Résultats
+## **Usage**
 
-Contient les résultats générés tels que les rapports, modèles et clusters :
-
-<img width="652" height="152" alt="image" src="https://github.com/user-attachments/assets/62bd1110-7aa0-439a-ab47-06d55aeb176f" />
-
-
-Exemple : cluster_file/
-
-dynamic_clustered.csv: Résultats du clustering dynamique.
-
-static_clustered.csv: Résultats du clustering statique.
-
-Exemple : mapped_mittre/
-
-dynamic_mitre_mapped.csv: Données dynamiques mappées aux techniques MITRE.
-
-dynamic_mitre_mapped_with_labels.json: Données mappées avec des labels.
-
-# 4. logs/ - Journaux
-
-Contient les journaux d'exécution et les fichiers de configuration :
-
-<img width="641" height="155" alt="image" src="https://github.com/user-attachments/assets/da6c2b41-7c40-42c2-afe3-e8f8892abaad" />
-
-
-# 5. mapping/ - Correspondance MITRE
-
-Contient les fichiers de correspondance pour mapper les événements aux techniques MITRE ATT&CK :
-
-<img width="619" height="124" alt="image" src="https://github.com/user-attachments/assets/da3c390f-5d09-4b1c-b7ab-5ab1462ed825" />
-
-
-# 6. config/ - Configuration
-
-Contient les fichiers de configuration globaux :
-
-<img width="629" height="68" alt="image" src="https://github.com/user-attachments/assets/614b18a6-abe1-4a5a-8e78-3ae33d847622" />
-
-
-# 7. bert_model/ - Modèle BERT
-
-Contient les fichiers associés au modèle BERT :
-
-bert_model/
-<img width="604" height="172" alt="image" src="https://github.com/user-attachments/assets/e9fa2140-3219-4eec-b6cf-024c5f0041bc" />
-
-Installation
-Prérequis
-
-Assurez-vous que vous avez Python 3.7 ou supérieur installé. Il est également recommandé d'utiliser un environnement virtuel.
-
-Clonez le dépôt :
-
-git clone https://github.com/ulrich-joel/innovsecu.git
-cd innovsecu
-
-
-Installez les dépendances :
-`` 
-pip install -r requirements.txt
-``
-Utilisation
-
-Lancez le script principal :
-```
+To run the main pipeline:
+```bash
 python src/main.py
 ```
 
-Pour exécuter le clustering :
-```
+To execute clustering separately:
+```bash
 python src/clustering.py
 ```
-# Améliorations Possibles
 
-Gestion des fichiers volumineux : Utilisez Git LFS
- pour gérer les fichiers volumineux comme model.safetensors et les fichiers CSV volumineux.
+---
 
-Documentation : Ajouter des docstrings détaillées dans chaque script pour mieux expliquer leur rôle et leur fonctionnement.
+## **Future Improvements**
+- **Large File Handling**: Use Git LFS for managing large files like `model.safetensors` and large CSV files.
+- **Documentation**: Add detailed docstrings in each script for better clarity.
+- **Unit Testing**: Implement unit tests to validate each step of the pipeline.
 
-Tests unitaires : Implémenter des tests unitaires pour valider chaque étape du pipeline.
+---
 
-Auteurs
-
-Ce projet a été développé par Ngueyep Ulrich. Pour toute question ou suggestion, n'hésitez pas à me contacter via ulrich.ngueyepl@cybersearchlab.com
+## **Authors**
+This project was developed by Ngueyep Ulrich. For any questions or suggestions, feel free to contact me at ulrich.ngueyepl@cybersearchlab.com

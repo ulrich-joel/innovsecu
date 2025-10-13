@@ -1,6 +1,13 @@
 # src/main.py
+import sys
 import os
+import subprocess
+import traceback
 import pandas as pd
+
+# Add the project root directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from config.config import Config
 from .preprocessing.processor_static import clean_static_data
 from .preprocessing.processor_dynamic import DynamicLogPreprocessor
@@ -8,12 +15,33 @@ from .mitre_mapper import run_mitre_mapping
 from .clustering import ClusteringModel
 from .logger import logger
 
-import traceback
+def start_file_monitoring():
+    """
+    Start the file monitoring system by running setup.py as a subprocess.
+    """
+    try:
+        subprocess.Popen(["python", "src/setup.py"])
+        logger.info("File monitoring system started.")
+    except Exception as e:
+        logger.error(f"Failed to start file monitoring system: {e}")
 
 def load_and_concat_csv(path):
-    import glob
+    """
+    Load and concatenate CSV files from a directory or a single file.
+
+    Args:
+        path (str): Path to a directory or a single CSV file.
+
+    Returns:
+        pd.DataFrame: Concatenated DataFrame.
+
+    Raises:
+        FileNotFoundError: If the path does not exist.
+    """
     if os.path.isdir(path):
         files = glob.glob(os.path.join(path, "*.csv"))
+        if not files:
+            raise FileNotFoundError(f"No CSV files found in directory: {path}")
         dfs = [pd.read_csv(f) for f in files]
         return pd.concat(dfs, ignore_index=True)
     elif os.path.isfile(path):
@@ -26,6 +54,9 @@ def feature_engineering(df):
     return df[numeric_cols]
 
 def main():
+    # Start the file monitoring system
+    start_file_monitoring()
+
     config = Config()
     paths = config.DATASETS
 
@@ -57,12 +88,6 @@ def main():
 
         clustering_static = ClusteringModel(n_clusters=6)
         static_clustered = clustering_static.fit_predict(features_static)
-
-        # Safety check: ensure the path is not a directory
-        if os.path.isdir(paths['static_clustered']):
-            import shutil
-            shutil.rmtree(paths['static_clustered'])
-            logger.warning(f"{paths['static_clustered']} was a directory. Removed it.")
 
         static_clustered.to_csv(paths['static_clustered'], index=False)
         logger.info(f"Static clustering completed and saved to {paths['static_clustered']}")

@@ -4,21 +4,27 @@ import joblib
 import matplotlib.pyplot as plt
 from sklearn.metrics import (
     precision_score, recall_score, f1_score,
-    roc_auc_score, RocCurveDisplay, PrecisionRecallDisplay
+    roc_auc_score, RocCurveDisplay, PrecisionRecallDisplay,
+    confusion_matrix, ConfusionMatrixDisplay
 )
 from config.config import Config
 
+# Initialize configuration
 config = Config()
 
 # --- Load test data ---
 X_test = np.load(config.X_TEST_FILE)
 y_test = (np.load(config.Y_TEST_FILE) > 0).astype(int)
 
-# --- Helper to evaluate a model and display metrics ---
+# --- Helper to evaluate a model and return metrics ---
 def evaluate_model(name, y_true, y_pred, y_scores=None):
     precision = precision_score(y_true, y_pred, zero_division=0)
     recall = recall_score(y_true, y_pred, zero_division=0)
     f1 = f1_score(y_true, y_pred, zero_division=0)
+    
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    
     try:
         auc = roc_auc_score(y_true, y_scores if y_scores is not None else y_pred)
     except ValueError:
@@ -26,15 +32,16 @@ def evaluate_model(name, y_true, y_pred, y_scores=None):
     
     print(f"\n== {name} ==\nPrecision: {precision:.3f}, Recall: {recall:.3f}, F1: {f1:.3f}, AUC: {auc:.3f}")
     
-    RocCurveDisplay.from_predictions(
-        y_true, y_scores if y_scores is not None else y_pred, name=f"{name} ROC"
-    )
-    PrecisionRecallDisplay.from_predictions(
-        y_true, y_scores if y_scores is not None else y_pred, name=f"{name} PR"
-    )
-    plt.show()
-    
-    return {"name": name, "precision": precision, "recall": recall, "f1": f1, "auc": auc}
+    return {
+        "name": name, 
+        "precision": precision, 
+        "recall": recall, 
+        "f1": f1, 
+        "auc": auc,
+        "y_scores": y_scores,
+        "y_pred": y_pred,
+        "confusion_matrix": cm
+    }
 
 # --- Evaluate all Isolation Forest models ---
 results = []
@@ -55,111 +62,110 @@ for filename in os.listdir(config.MODELS_DIR):
         
         results.append(evaluate_model(f"IF_cont={contamination}", y_test, y_pred, y_scores))
 
-# --- Evaluate KMeans model ---
-print("\n🔍 Evaluating KMeans model:")
-kmeans = joblib.load(config.KMEANS_MODEL_PATH)
-cluster_labels = kmeans.predict(X_test)
-dists = np.linalg.norm(X_test - kmeans.cluster_centers_[cluster_labels], axis=1)
-threshold = np.percentile(dists, 95)
-y_pred_kmeans = (dists > threshold).astype(int)
+# --- Create visualizations ---
+print("\n📊 Generating visualizations...")
 
-results.append(evaluate_model("KMeans (95th percentile)", y_test, y_pred_kmeans, dists))
+# Select all 4 Isolation Forest contamination levels
+if_models = [r for r in results if r['name'].startswith('IF_cont=')]
+if_models_sorted = sorted(if_models, key=lambda x: float(x['name'].split('=')[1]))
+
+# Take the 4 contamination levels
+selected_models = if_models_sorted[:4]  # 1%, 5%, 10%, 15%
+
+# Define distinct colors for each contamination level
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']  # Blue, Orange, Green, Red
+
+# === FIGURE 1: ROC and Precision-Recall Curves ===
+fig1, axes1 = plt.subplots(2, 2, figsize=(16, 12))
+
+for i, (model, color) in enumerate(zip(selected_models, colors)):
+    row = i // 2
+    col = i % 2
+    
+    # Get scores for plotting
+    scores = model['y_scores'] if model['y_scores'] is not None else model['y_pred']
+    
+    # Plot ROC curve (solid line)
+    RocCurveDisplay.from_predictions(
+        y_test, 
+        scores, 
+        ax=axes1[row, col],
+        name=f"ROC (AUC: {model['auc']:.3f})",
+        color=color,
+        linestyle='-',
+        linewidth=2
+    )
+    
+    # Plot Precision-Recall curve (dashed line)
+    PrecisionRecallDisplay.from_predictions(
+        y_test, 
+        scores, 
+        ax=axes1[row, col],
+        name=f"PR (F1: {model['f1']:.3f})",
+        color=color,
+        linestyle='--',
+        linewidth=2
+    )
+    
+    # Add diagonal line for ROC reference
+    axes1[row, col].plot([0, 1], [0, 1], 'k:', alpha=0.3, label='Random Classifier')
+    
+    # Customize the subplot
+    axes1[row, col].set_title(f"{model['name']}\nPrecision: {model['precision']:.3f}, Recall: {model['recall']:.3f}", 
+                           fontsize=12, fontweight='bold', pad=10)
+    axes1[row, col].legend(loc='lower right', fontsize=9)
+    axes1[row, col].grid(True, alpha=0.3)
+    axes1[row, col].set_ylabel('True Positive Rate / Precision')
+    
+    # Add right-side label for False Positive Rate
+    axes1[row, col].text(1.02, 0.5, 'False Positive Rate', transform=axes1[row, col].transAxes, 
+                       rotation=270, va='center', ha='left', fontsize=11)
+    
+    # Only show "Recall" label on bottom row
+    if row == 1:  # Bottom row
+        axes1[row, col].set_xlabel('Recall')
+    else:  # Top row - no xlabel
+        axes1[row, col].set_xlabel('')
+
+# plt.suptitle('ROC and Precision-Recall Curves - Isolation Forest with Different Contamination Levels\n(Solid: ROC, Dashed: Precision-Recall)', 
+#              fontsize=16, fontweight='bold', y=0.98)
+plt.tight_layout()
+plt.savefig('isolation_forest_curves_4in1.png', dpi=300, bbox_inches='tight')
+plt.show()
+print("✅ ROC and Precision-Recall curves 4-in-1 saved as 'isolation_forest_curves_4in1.png'")
+
+# === FIGURE 2: Confusion Matrices ===
+fig2, axes2 = plt.subplots(2, 2, figsize=(16, 12))
+
+for i, model in enumerate(selected_models):
+    row = i // 2
+    col = i % 2
+    
+    # Plot confusion matrix
+    cm = model['confusion_matrix']
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Anomaly'])
+    disp.plot(ax=axes2[row, col], cmap='Blues', values_format='d')
+    
+    # Customize the subplot
+    axes2[row, col].set_title(f"{model['name']}\nTP: {cm[1,1]}, FP: {cm[0,1]}, FN: {cm[1,0]}, TN: {cm[0,0]}", 
+                            fontsize=12, fontweight='bold', pad=10)
+    
+    # Add performance metrics to the plot
+    metrics_text = f"Precision: {model['precision']:.3f}\nRecall: {model['recall']:.3f}\nF1: {model['f1']:.3f}"
+    axes2[row, col].text(0.95, 0.05, metrics_text, transform=axes2[row, col].transAxes,
+                        verticalalignment='bottom', horizontalalignment='right',
+                        bbox=dict(boxstyle='round', facecolor='white', alpha=0.8),
+                        fontsize=9)
+
+# plt.suptitle('Confusion Matrices - Isolation Forest with Different Contamination Levels', 
+#              fontsize=16, fontweight='bold', y=0.98)
+plt.tight_layout()
+plt.savefig('isolation_forest_confusion_4in1.png', dpi=300, bbox_inches='tight')
+plt.show()
+print("✅ Confusion matrices 4-in-1 saved as 'isolation_forest_confusion_4in1.png'")
 
 # --- Display Summary ---
 import pandas as pd
 df = pd.DataFrame(results)[["name", "precision", "recall", "f1", "auc"]]
 print("\n📊 Model Performance Summary:")
 print(df.to_string(index=False))
-
-# import numpy as np
-# import joblib
-# from config.config import Config
-# from sklearn.metrics import (
-#     classification_report,
-#     confusion_matrix,
-#     precision_score,
-#     recall_score,
-#     f1_score,
-#     roc_auc_score,
-#     RocCurveDisplay,
-#     PrecisionRecallDisplay,
-# )
-# import matplotlib.pyplot as plt
-
-# # Load configuration
-# config = Config()
-
-# # Load test data and labels
-# X_test = np.load(config.X_TEST_FILE)
-# y_test = np.load(config.Y_TEST_FILE)
-
-# # Sanity check
-# assert len(X_test) == len(y_test), f"Shape mismatch: X_test={len(X_test)}, y_test={len(y_test)}"
-
-# # Ensure y_test is binary (0 = normal, 1 = anomaly)
-# y_test = (y_test > 0).astype(int)
-
-# # Load trained models
-# isolation_forest = joblib.load(config.ISOLATION_FOREST_MODEL_PATH)
-# kmeans = joblib.load(config.KMEANS_MODEL_PATH)
-
-# ### === Isolation Forest Evaluation === ###
-# print("\n=== Isolation Forest Evaluation ===")
-# if_raw_preds = isolation_forest.predict(X_test)  # -1 = anomaly, 1 = normal
-# if_preds = np.where(if_raw_preds == -1, 1, 0)
-
-# print(f"Detected anomalies: {np.sum(if_preds)} / {len(if_preds)}")
-# print("Precision:", precision_score(y_test, if_preds))
-# print("Recall:", recall_score(y_test, if_preds))
-# print("F1 Score:", f1_score(y_test, if_preds))
-
-# try:
-#     print("AUC:", roc_auc_score(y_test, if_preds))
-# except ValueError:
-#     print("⚠️ AUC cannot be computed (only one class in y_test)")
-
-# print("\nClassification Report:\n", classification_report(y_test, if_preds))
-# print("Confusion Matrix:\n", confusion_matrix(y_test, if_preds))
-
-# # Plot curves
-# RocCurveDisplay.from_predictions(y_test, if_preds)
-# plt.title("ROC Curve - Isolation Forest")
-# plt.grid(True)
-# plt.show()
-
-# PrecisionRecallDisplay.from_predictions(y_test, if_preds)
-# plt.title("Precision-Recall Curve - Isolation Forest")
-# plt.grid(True)
-# plt.show()
-
-
-# ### === KMeans Evaluation === ###
-# print("\n=== KMeans Evaluation ===")
-# kmeans_labels = kmeans.predict(X_test)
-# distances = np.linalg.norm(X_test - kmeans.cluster_centers_[kmeans_labels], axis=1)
-# threshold = np.percentile(distances, 98)
-# kmeans_preds = (distances > threshold).astype(int)
-
-# print(f"Detected anomalies (threshold @95%): {np.sum(kmeans_preds)} / {len(kmeans_preds)}")
-# print("Precision:", precision_score(y_test, kmeans_preds))
-# print("Recall:", recall_score(y_test, kmeans_preds))
-# print("F1 Score:", f1_score(y_test, kmeans_preds))
-
-# try:
-#     print("AUC:", roc_auc_score(y_test, kmeans_preds))
-# except ValueError:
-#     print("⚠️ AUC cannot be computed (only one class in y_test)")
-
-# print("\nClassification Report:\n", classification_report(y_test, kmeans_preds))
-# print("Confusion Matrix:\n", confusion_matrix(y_test, kmeans_preds))
-
-# # Plot ROC and PR curves based on distance scores
-# RocCurveDisplay.from_predictions(y_test, distances)
-# plt.title("ROC Curve - KMeans (Distance Scores)")
-# plt.grid(True)
-# plt.show()
-
-# PrecisionRecallDisplay.from_predictions(y_test, distances)
-# plt.title("Precision-Recall Curve - KMeans (Distance Scores)")
-# plt.grid(True)
-# plt.show()

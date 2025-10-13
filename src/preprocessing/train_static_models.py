@@ -1,3 +1,27 @@
+"""
+train_static_models.py
+
+This script is responsible for training static models for anomaly detection and clustering.
+It includes the following steps:
+1. Load and preprocess the static dataset.
+2. Split the dataset into training, validation, and testing sets.
+3. Train multiple Isolation Forest models with different contamination levels.
+4. Train a KMeans clustering model.
+5. Save the trained models and data splits for future use.
+
+Dependencies:
+- Pandas and NumPy for data manipulation.
+- Scikit-learn for preprocessing, model training, and evaluation.
+- Joblib for saving and loading models.
+- Config module for project-specific configurations.
+
+Outputs:
+- Processed datasets saved as `.npy` files in the `PROCESSED_STATIC_DIR`.
+- Trained models saved in the `MODELS_DIR`.
+
+Author: Ngueyep Ulrich
+"""
+
 import os
 import pandas as pd
 import numpy as np
@@ -105,41 +129,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# #src/preprocessing/train_static_models.py
-# import torch
-# import logging
-# import numpy as np
-# from config.config import Config
-# from src.detection.vae_model import ModelTrainer
-
-# def main():
-#     logging.basicConfig(level=logging.INFO)
-#     config = Config()
-#     trainer = ModelTrainer(device="cpu")
-
-#     # Load the full VAE data
-#     full_tensor = torch.load(config.VAE_DATA_FILE)
-
-#     # Dynamic split: train / validation
-#     train_size = int(0.8 * len(full_tensor))
-#     val_size = len(full_tensor) - train_size
-#     train_tensor, val_tensor = torch.utils.data.random_split(full_tensor, [train_size, val_size])
-
-#     # Extract actual tensors (optional depending on PyTorch version)
-#     train_tensor = train_tensor.dataset[train_tensor.indices] if hasattr(train_tensor, 'indices') else train_tensor
-#     val_tensor = val_tensor.dataset[val_tensor.indices] if hasattr(val_tensor, 'indices') else val_tensor
-
-#     logging.info("✅ Training Variational Autoencoder (VAE)...")
-#     trainer.train_vae(train_tensor, val_tensor, config)
-
-#     logging.info("✅ Training Isolation Forest...")
-#     x_train = np.load(config.IF_KMEANS_TRAIN_FILE)
-#     trainer.train_isolation_forest(x_train)
-
-#     logging.info("✅ Training KMeans...")
-#     trainer.train_kmeans(x_train)
-
-# if __name__ == "__main__":
-#     main()

@@ -1,4 +1,26 @@
 # src/preprocessing/preprocess_combined.py
+"""
+preprocess_combined.py
+
+This script preprocesses and combines static and dynamic features into a single dataset for further analysis or modeling.
+It includes the following steps:
+1. Load raw static and dynamic datasets.
+2. Merge the datasets on the `processName` column.
+3. Select relevant features from both datasets.
+4. Standardize the combined dataset (mean = 0, std = 1).
+5. Save the preprocessed and combined dataset as a `.npy` file.
+
+Dependencies:
+- Pandas and NumPy for data manipulation.
+- Scikit-learn for preprocessing (StandardScaler).
+- Config module for project-specific configurations.
+
+Outputs:
+- Combined and standardized dataset saved as a `.npy` file.
+
+Author: Ngueyep Ulrich
+"""
+
 import pandas as pd
 import numpy as np
 import os

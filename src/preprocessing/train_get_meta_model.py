@@ -1,3 +1,32 @@
+"""
+train_get_meta_model.py
+
+This script is responsible for training meta-classifiers using features derived from Isolation Forest and KMeans models.
+It includes the following steps:
+1. Load preprocessed static datasets (train, validation, and test splits).
+2. Load trained Isolation Forest and KMeans models.
+3. Generate meta-features using the decision scores of the Isolation Forest models and the distances from the KMeans model.
+4. Train meta-classifiers (Logistic Regression, Random Forest, and SVM) using the generated meta-features.
+5. Evaluate the meta-classifiers on the train, validation, and test datasets.
+6. Visualize and save feature importance for each meta-classifier.
+7. Save the best-performing meta-classifier and its scaler.
+
+Dependencies:
+- NumPy and Pandas for data manipulation.
+- Scikit-learn for preprocessing, model training, and evaluation.
+- Joblib for saving and loading models.
+- Matplotlib for plotting feature importance.
+- Config module for project-specific configurations.
+
+Outputs:
+- Meta-features saved as `.npy` files.
+- Trained meta-classifiers saved in the `MODELS_DIR`.
+- Feature importance plots saved as `.png` files.
+- Best-performing meta-classifier and its scaler saved in the `MODELS_DIR`.
+
+Author: Ngueyep Ulrich
+"""
+
 import os
 import numpy as np
 import joblib
