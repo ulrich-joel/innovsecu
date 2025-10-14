@@ -1,51 +1,177 @@
-# src/evaluation/evaluate_static_supervised.py
+# src/evaluation/fusion.py
+"""
+fusion.py
+
+Evaluate multiple meta-classifiers on test data using metrics 
+such as precision, recall, F1-score, and AUC. Generates ROC curve,
+confusion matrix, and feature importance for each.
+
+Author: Ngueyep Ulrich
+Date: 2025-10-13
+"""
+
 import os
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 import joblib
+import matplotlib.pyplot as plt
+from sklearn.metrics import (
+    precision_recall_fscore_support,
+    roc_auc_score,
+    roc_curve,
+    confusion_matrix,
+    ConfusionMatrixDisplay
+)
+from sklearn.inspection import permutation_importance
 from config.config import Config
+from src.logger import get_logger
 
+logger = get_logger("evaluate_meta_models")
+
+# === Config ===
 config = Config()
+DATA_DIR = config.PROCESSED_STATIC_DIR
+MODELS_DIR = config.MODELS_DIR
+CONTAMINATIONS = [1, 5, 10, 15]
+feature_names = [f"IF_{c}%" for c in CONTAMINATIONS] + ["KMeans"]
 
-# Load test features and true labels
-y_test_path = os.path.join(config.PROCESSED_STATIC_DIR, 'y_test.npy')  # path to test labels
-x_test = np.load(config.IF_KMEANS_TEST_FILE)  # test features
-y_test = np.load(y_test_path)  # test labels
+# === Load test data and models ===
+logger.info("📦 Loading test data and models...")
+X_test = np.load(os.path.join(DATA_DIR, "x_test.npy"))
+y_test = np.load(os.path.join(DATA_DIR, "y_test.npy"))
+scaler = joblib.load(os.path.join(MODELS_DIR, "meta_scaler.pkl"))
 
-print("=== ⚡️ Isolation Forest Evaluation ===")
-isolation_path = config.ISOLATION_FOREST_MODEL_PATH
-isolation_forest = joblib.load(isolation_path)
-# Isolation Forest predicts -1 for anomalies, convert to 1 for evaluation
-y_pred_if = (isolation_forest.predict(x_test) == -1).astype(int)
+model_files = {
+    "Logistic Regression": "meta_model_logistic_regression.pkl",
+    "Random Forest": "meta_model_random_forest.pkl",
+    "SVM (Linear)": "meta_model_svm_linear.pkl"
+}
+models = {
+    name: joblib.load(os.path.join(MODELS_DIR, fname))
+    for name, fname in model_files.items()
+}
 
-print("Confusion Matrix:")
-print(confusion_matrix(y_test, y_pred_if))
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred_if))
+kmeans_model = joblib.load(os.path.join(MODELS_DIR, "kmeans.pkl"))
+if_models = {
+    cont: joblib.load(os.path.join(MODELS_DIR, f"isolation_forest_{cont}.pkl"))
+    for cont in CONTAMINATIONS
+}
 
-try:
-    auc_if = roc_auc_score(y_test, y_pred_if)
-    print(f"ROC AUC: {auc_if:.4f}")
-except ValueError:
-    print("ROC AUC: Cannot be computed (only one class present in y_test)")
+# === Feature construction ===
+def get_meta_features(X):
+    features = [model.decision_function(X) for model in if_models.values()]
+    kmeans_dist = kmeans_model.transform(X).min(axis=1)
+    features.append(kmeans_dist)
+    return np.vstack(features).T
 
-print("\n=== ⚡️ KMeans Evaluation ===")
-kmeans_path = config.KMEANS_MODEL_PATH
-kmeans = joblib.load(kmeans_path)
+X_test_meta = scaler.transform(get_meta_features(X_test))
 
-# Calculate distances between each point and its assigned cluster center
-distances = np.linalg.norm(x_test - kmeans.cluster_centers_[kmeans.predict(x_test)], axis=1)
-threshold = np.percentile(distances, 95)  # arbitrary threshold at 95th percentile
-# Points with distance above threshold are considered anomalies
-y_pred_kmeans = (distances > threshold).astype(int)
+# === Evaluation function ===
+def evaluate_model(model, X, y):
+    preds = model.predict(X)
+    probs = model.predict_proba(X)[:, 1] if hasattr(model, "predict_proba") else model.decision_function(X)
+    precision, recall, f1, _ = precision_recall_fscore_support(y, preds, average="binary")
+    auc = roc_auc_score(y, probs)
+    return preds, probs, precision, recall, f1, auc
 
-print("Confusion Matrix:")
-print(confusion_matrix(y_test, y_pred_kmeans))
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred_kmeans))
+# === Couleurs fixes pour chaque modèle ===
+color_map = {
+    "Logistic Regression": "blue",
+    "Random Forest": "green",
+    "SVM (Linear)": "red"
+}
 
-try:
-    auc_km = roc_auc_score(y_test, y_pred_kmeans)
-    print(f"ROC AUC: {auc_km:.4f}")
-except ValueError:
-    print("ROC AUC: Cannot be computed")
+# === Evaluation, plots individuels, et collecte confusion matrices ===
+conf_matrices = {}
+roc_data = {}
+
+for name, model in models.items():
+    logger.info(f"🔍 Evaluating {name}...")
+    preds, probs, precision, recall, f1, auc = evaluate_model(model, X_test_meta, y_test)
+    logger.info(f"{name} - Precision: {precision:.3f} | Recall: {recall:.3f} | F1: {f1:.3f} | AUC: {auc:.3f}")
+    
+    # ROC Curve individuelle
+    fpr, tpr, _ = roc_curve(y_test, probs)
+    plt.figure()
+    plt.plot(fpr, tpr, label=f"{name} (AUC = {auc:.3f})", color=color_map.get(name, None))
+    plt.plot([0, 1], [0, 1], 'k--', label="Random chance")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"ROC Curve - {name}")
+    plt.legend(loc="lower right")
+    plt.tight_layout()
+    roc_path = os.path.join(MODELS_DIR, f"roc_curve_{name.replace(' ', '_').lower()}.png")
+    plt.savefig(roc_path)
+    plt.close()
+    logger.info(f"📈 ROC curve saved at: {roc_path}")
+    
+    # Stocker les données ROC pour fusion
+    roc_data[name] = (fpr, tpr, auc)
+
+    # Confusion Matrix individuelle
+    cm = confusion_matrix(y_test, preds)
+    conf_matrices[name] = cm
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(cmap=plt.cm.Blues)
+    plt.title(f"Confusion Matrix - {name}")
+    cm_path = os.path.join(MODELS_DIR, f"conf_matrix_{name.replace(' ', '_').lower()}.png")
+    plt.savefig(cm_path)
+    plt.close()
+    logger.info(f"📈 Confusion matrix saved at: {cm_path}")
+
+    # Feature Importance individuelle
+    plt.figure(figsize=(8, 4))
+    if hasattr(model, "coef_"):
+        importances = abs(model.coef_[0])
+        plt.title(f"Feature Importance ({name})")
+    elif hasattr(model, "feature_importances_"):
+        importances = model.feature_importances_
+        plt.title(f"Feature Importance ({name})")
+    else:
+        logger.info(f"Using permutation importance for {name}...")
+        perm = permutation_importance(model, X_test_meta, y_test, n_repeats=20, random_state=42)
+        importances = perm.importances_mean
+        plt.title(f"Feature Importance ({name} - Permutation)")
+    
+    plt.bar(feature_names, importances)
+    plt.xticks(rotation=45)
+    plt.ylabel("Importance")
+    plt.tight_layout()
+    importance_path = os.path.join(MODELS_DIR, f"feature_importance_{name.replace(' ', '_').lower()}.png")
+    plt.savefig(importance_path)
+    plt.close()
+    logger.info(f"📈 Feature importance plot saved at: {importance_path}")
+
+# === Combined Confusion Matrix Plot ===
+fig, axes = plt.subplots(1, len(conf_matrices), figsize=(5 * len(conf_matrices), 4))
+
+if len(conf_matrices) == 1:
+    axes = [axes]  # handle single plot case
+
+for ax, (name, cm) in zip(axes, conf_matrices.items()):
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(ax=ax, cmap=plt.cm.Blues)  # colorbar visible for better contrast
+    ax.set_title(name)
+
+plt.suptitle("Matrice de confusion - Tous les modèles")
+plt.tight_layout()
+plt.subplots_adjust(top=0.85)
+plt_path = os.path.join(MODELS_DIR, "all_confusion_matrices.png")
+plt.savefig(plt_path)
+plt.show()
+logger.info(f"📊 Combined confusion matrices saved at: {plt_path}")
+
+# === Combined ROC Curve Plot ===
+plt.figure(figsize=(8, 6))
+for name, (fpr, tpr, auc) in roc_data.items():
+    plt.plot(fpr, tpr, label=f"{name} (AUC = {auc:.3f})", color=color_map.get(name, None))
+
+plt.plot([0, 1], [0, 1], 'k--', label="Random chance")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve - Tous les modèles")
+plt.legend(loc="lower right")
+plt.tight_layout()
+roc_all_path = os.path.join(MODELS_DIR, "roc_curve_all_models.png")
+plt.savefig(roc_all_path)
+plt.show()
+logger.info(f"📈 ROC curve (all models) saved at: {roc_all_path}")
