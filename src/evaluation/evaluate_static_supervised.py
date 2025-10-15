@@ -1,13 +1,18 @@
-# src/evaluation/fusion.py
+# src/evaluation/evaluate_static_supervised.py
 """
-fusion.py
+===============================================================================
+ Evaluate Model Training Script
+===============================================================================
 
 Evaluate multiple meta-classifiers on test data using metrics 
 such as precision, recall, F1-score, and AUC. Generates ROC curve,
 confusion matrix, and feature importance for each.
 
+===============================================================================
+
 Author: Ngueyep Ulrich
 Date: 2025-10-13
+===============================================================================
 """
 
 import os
@@ -30,15 +35,16 @@ logger = get_logger("evaluate_meta_models")
 # === Config ===
 config = Config()
 DATA_DIR = config.PROCESSED_STATIC_DIR
-MODELS_DIR = config.MODELS_DIR
+EVAL_DIR = config.EVALUATION_DIR
+MODEL_DIR = config.MODELS_DIR_STATIC_TRAIN
 CONTAMINATIONS = [1, 5, 10, 15]
 feature_names = [f"IF_{c}%" for c in CONTAMINATIONS] + ["KMeans"]
 
 # === Load test data and models ===
-logger.info("📦 Loading test data and models...")
+logger.info(" Loading test data and models...")
 X_test = np.load(os.path.join(DATA_DIR, "x_test.npy"))
 y_test = np.load(os.path.join(DATA_DIR, "y_test.npy"))
-scaler = joblib.load(os.path.join(MODELS_DIR, "meta_scaler.pkl"))
+scaler = joblib.load(os.path.join(MODEL_DIR, "meta_scaler.pkl"))
 
 model_files = {
     "Logistic Regression": "meta_model_logistic_regression.pkl",
@@ -46,13 +52,13 @@ model_files = {
     "SVM (Linear)": "meta_model_svm_linear.pkl"
 }
 models = {
-    name: joblib.load(os.path.join(MODELS_DIR, fname))
+    name: joblib.load(os.path.join(MODEL_DIR, fname))
     for name, fname in model_files.items()
 }
 
-kmeans_model = joblib.load(os.path.join(MODELS_DIR, "kmeans.pkl"))
+kmeans_model = joblib.load(os.path.join(MODEL_DIR, "kmeans.pkl"))
 if_models = {
-    cont: joblib.load(os.path.join(MODELS_DIR, f"isolation_forest_{cont}.pkl"))
+    cont: joblib.load(os.path.join(MODEL_DIR, f"isolation_forest_{cont}.pkl"))
     for cont in CONTAMINATIONS
 }
 
@@ -99,10 +105,10 @@ for name, model in models.items():
     plt.title(f"ROC Curve - {name}")
     plt.legend(loc="lower right")
     plt.tight_layout()
-    roc_path = os.path.join(MODELS_DIR, f"roc_curve_{name.replace(' ', '_').lower()}.png")
+    roc_path = os.path.join(EVAL_DIR, f"roc_curve_{name.replace(' ', '_').lower()}.png")
     plt.savefig(roc_path)
     plt.close()
-    logger.info(f"📈 ROC curve saved at: {roc_path}")
+    logger.info(f"ROC curve saved at: {roc_path}")
     
     # Stocker les données ROC pour fusion
     roc_data[name] = (fpr, tpr, auc)
@@ -113,10 +119,10 @@ for name, model in models.items():
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
     disp.plot(cmap=plt.cm.Blues)
     plt.title(f"Confusion Matrix - {name}")
-    cm_path = os.path.join(MODELS_DIR, f"conf_matrix_{name.replace(' ', '_').lower()}.png")
+    cm_path = os.path.join(EVAL_DIR, f"conf_matrix_{name.replace(' ', '_').lower()}.png")
     plt.savefig(cm_path)
     plt.close()
-    logger.info(f"📈 Confusion matrix saved at: {cm_path}")
+    logger.info(f"Confusion matrix saved at: {cm_path}")
 
     # Feature Importance individuelle
     plt.figure(figsize=(8, 4))
@@ -136,10 +142,10 @@ for name, model in models.items():
     plt.xticks(rotation=45)
     plt.ylabel("Importance")
     plt.tight_layout()
-    importance_path = os.path.join(MODELS_DIR, f"feature_importance_{name.replace(' ', '_').lower()}.png")
+    importance_path = os.path.join(EVAL_DIR, f"feature_importance_{name.replace(' ', '_').lower()}.png")
     plt.savefig(importance_path)
     plt.close()
-    logger.info(f"📈 Feature importance plot saved at: {importance_path}")
+    logger.info(f"Feature importance plot saved at: {importance_path}")
 
 # === Combined Confusion Matrix Plot ===
 fig, axes = plt.subplots(1, len(conf_matrices), figsize=(5 * len(conf_matrices), 4))
@@ -155,10 +161,10 @@ for ax, (name, cm) in zip(axes, conf_matrices.items()):
 plt.suptitle("Matrice de confusion - Tous les modèles")
 plt.tight_layout()
 plt.subplots_adjust(top=0.85)
-plt_path = os.path.join(MODELS_DIR, "all_confusion_matrices.png")
+plt_path = os.path.join(EVAL_DIR, "all_confusion_matrices.png")
 plt.savefig(plt_path)
 plt.show()
-logger.info(f"📊 Combined confusion matrices saved at: {plt_path}")
+logger.info(f"Combined confusion matrices saved at: {plt_path}")
 
 # === Combined ROC Curve Plot ===
 plt.figure(figsize=(8, 6))
@@ -171,7 +177,43 @@ plt.ylabel("True Positive Rate")
 plt.title("ROC Curve - Tous les modèles")
 plt.legend(loc="lower right")
 plt.tight_layout()
-roc_all_path = os.path.join(MODELS_DIR, "roc_curve_all_models.png")
+roc_all_path = os.path.join(EVAL_DIR, "roc_curve_all_models.png")
 plt.savefig(roc_all_path)
 plt.show()
-logger.info(f"📈 ROC curve (all models) saved at: {roc_all_path}")
+logger.info(f"ROC curve (all models) saved at: {roc_all_path}")
+
+# === Comparative Feature Importance Plot ===
+logger.info("Plotting comparative feature importance...")
+
+importances_dict = {}
+
+for name, model in models.items():
+    if hasattr(model, "coef_"):
+        importances = abs(model.coef_[0])
+    elif hasattr(model, "feature_importances_"):
+        importances = model.feature_importances_
+    else:
+        logger.info(f"Using permutation importance for {name}...")
+        perm = permutation_importance(model, X_test_meta, y_test, n_repeats=20, random_state=42)
+        importances = perm.importances_mean
+    importances_dict[name] = importances
+
+# Tracer un graphique comparatif côte à côte
+fig, axs = plt.subplots(1, len(importances_dict), figsize=(15, 4), sharey=True)
+colors = ["skyblue", "lightgreen", "lightcoral"]
+
+for idx, (name, importances) in enumerate(importances_dict.items()):
+    axs[idx].bar(feature_names, importances, color=colors[idx % len(colors)])
+    axs[idx].set_title(name)
+    axs[idx].set_xticks(range(len(feature_names))) 
+    axs[idx].set_xticklabels(feature_names, rotation=45)
+    axs[idx].set_ylabel("Importance")
+
+plt.suptitle("Comparaison des importances des caractéristiques (par modèle)")
+plt.tight_layout()
+
+# Sauvegarde du graphique comparatif
+feature_plot_path = os.path.join(EVAL_DIR, "comparative_feature_importance.png")
+plt.savefig(feature_plot_path)
+plt.show()
+logger.info(f"Comparative feature importance plot saved at: {feature_plot_path}")

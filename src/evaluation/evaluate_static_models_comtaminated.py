@@ -1,3 +1,44 @@
+# src/evaluation/evaluate_static_models_comtaminated.py
+"""
+====================================================================================
+Dynamic Evaluation Script for Contaminated Static Anomaly Detection Models
+====================================================================================
+
+This script automatically evaluates all Isolation Forest models stored in the 
+configured models directory. Each model is assumed to use a different contamination 
+level and is named following the pattern: `isolation_forest_<contamination>.pkl`.
+
+For each model:
+    - Predictions and anomaly scores are generated.
+    - Evaluation metrics (precision, recall, F1-score, AUC) are computed.
+    - Confusion matrices and visual performance plots are created.
+
+Visualizations:
+    - ROC and Precision-Recall curves (4 models in one plot)
+    - Confusion matrices (with TP/FP/FN/TN info per subplot)
+
+------------------------------------------------------------------------------------
+
+Usage:
+    - Ensure that:
+        - Test data is available as `x_test.npy` and `y_test.npy`
+        - Trained models are placed in `models/` directory
+    - File names for models should follow the pattern: `isolation_forest_<x>.pkl`
+
+Outputs:
+    - `isolation_forest_curves_4in1.png`
+    - `isolation_forest_confusion_4in1.png`
+    - Printed performance table
+
+------------------------------------------------------------------------------------
+
+Author  : Ngueyep Ulrich
+Date    : 2025-10-14
+Version : 1.0
+
+====================================================================================
+"""
+
 import os
 import numpy as np
 import joblib
@@ -58,12 +99,14 @@ def evaluate_model(name, y_true, y_pred, y_scores=None):
 
 # === Evaluate all saved Isolation Forest models ===
 results = []
-print("🔍 Evaluating Isolation Forest models:")
+print(" Evaluating Isolation Forest models:")
 
-for filename in os.listdir(config.MODELS_DIR):
+model_dir = config.MODELS_DIR_STATIC_TRAIN # Directory containing the models
+
+for filename in os.listdir(model_dir):
     if filename.startswith("isolation_forest_") and filename.endswith(".pkl"):
         contamination = filename.split("_")[-1].replace(".pkl", "")
-        model_path = os.path.join(config.MODELS_DIR, filename)
+        model_path = os.path.join(model_dir, filename)
         model = joblib.load(model_path)
 
         raw_pred = model.predict(X_test)
@@ -77,8 +120,11 @@ for filename in os.listdir(config.MODELS_DIR):
         results.append(evaluate_model(f"IF_cont={contamination}", y_test, y_pred, y_scores))
 
 
-# === Visualization: ROC & Precision-Recall Curves ===
-print("\n📊 Generating visualizations...")
+
+print("\n Generating visualizations...")
+
+output_dir = config.EVALUATION_DIR
+os.makedirs(output_dir, exist_ok=True)
 
 # Filter Isolation Forest models and sort by contamination level
 if_models = [r for r in results if r['name'].startswith('IF_cont=')]
@@ -89,14 +135,13 @@ selected_models = if_models_sorted[:4]
 
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']  # Blue, Orange, Green, Red
 
-# === FIGURE 1: ROC & PR Curves ===
+# === FIGURE : ROC & PR Curves ===
 fig1, axes1 = plt.subplots(2, 2, figsize=(16, 12))
 
 for i, (model, color) in enumerate(zip(selected_models, colors)):
     row, col = divmod(i, 2)
     scores = model['y_scores'] if model['y_scores'] is not None else model['y_pred']
 
-    # ROC Curve
     RocCurveDisplay.from_predictions(
         y_test,
         scores,
@@ -107,7 +152,6 @@ for i, (model, color) in enumerate(zip(selected_models, colors)):
         linewidth=2
     )
 
-    # Precision-Recall Curve
     PrecisionRecallDisplay.from_predictions(
         y_test,
         scores,
@@ -118,7 +162,6 @@ for i, (model, color) in enumerate(zip(selected_models, colors)):
         linewidth=2
     )
 
-    # Random classifier line
     axes1[row, col].plot([0, 1], [0, 1], 'k:', alpha=0.3, label='Random Classifier')
 
     axes1[row, col].set_title(
@@ -133,47 +176,34 @@ for i, (model, color) in enumerate(zip(selected_models, colors)):
         axes1[row, col].set_xlabel('Recall')
 
 plt.tight_layout()
-plt.savefig('isolation_forest_curves_4in1.png', dpi=300, bbox_inches='tight')
-plt.show()
-print("✅ ROC and Precision-Recall curves saved as 'isolation_forest_curves_4in1.png'")
+
+roc_path = os.path.join(output_dir, 'isolation_forest_curves_4in1.png')
+fig1.savefig(roc_path, dpi=300, bbox_inches='tight')
+plt.close(fig1)
+print(f"✅ Saved ROC and PR curves to: {roc_path}")
 
 
-# === FIGURE 2: Confusion Matrices ===
-fig2, axes2 = plt.subplots(2, 2, figsize=(16, 12))
+# === FIGURE : Matrices de confusion ===
+fig2, axes2 = plt.subplots(2, 2, figsize=(12, 10))
 
 for i, model in enumerate(selected_models):
     row, col = divmod(i, 2)
     cm = model['confusion_matrix']
-
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Anomaly'])
-    disp.plot(ax=axes2[row, col], cmap='Blues', values_format='d')
-
-    axes2[row, col].set_title(
-        f"{model['name']}\nTP: {cm[1,1]}, FP: {cm[0,1]}, FN: {cm[1,0]}, TN: {cm[0,0]}",
-        fontsize=12, fontweight='bold'
-    )
-
-    metrics_text = (
-        f"Precision: {model['precision']:.3f}\n"
-        f"Recall: {model['recall']:.3f}\n"
-        f"F1: {model['f1']:.3f}"
-    )
-
-    axes2[row, col].text(
-        0.95, 0.05, metrics_text,
-        transform=axes2[row, col].transAxes,
-        ha='right', va='bottom',
-        fontsize=9,
-        bbox=dict(boxstyle='round', facecolor='white', alpha=0.8)
-    )
+    disp.plot(ax=axes2[row, col], cmap=plt.cm.Blues, colorbar=False)
+    axes2[row, col].set_title(model['name'], fontsize=12, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('isolation_forest_confusion_4in1.png', dpi=300, bbox_inches='tight')
-plt.show()
-print("✅ Confusion matrices saved as 'isolation_forest_confusion_4in1.png'")
 
+conf_mat_path = os.path.join(output_dir, 'isolation_forest_confusion_4in1.png')
+fig2.savefig(conf_mat_path, dpi=300, bbox_inches='tight')
+plt.close(fig2)
+print(f"✅ Saved confusion matrices to: {conf_mat_path}")
 
 # === Print performance summary ===
-df = pd.DataFrame(results)[["name", "precision", "recall", "f1", "auc"]]
-print("\n📊 Model Performance Summary:")
-print(df.to_string(index=False))
+if results:
+    df = pd.DataFrame(results)[["name", "precision", "recall", "f1", "auc"]]
+    print("\n Model Performance Summary:")
+    print(df.to_string(index=False))
+else:
+    print(f" No Isolation Forest models were found in the directory: {model_dir}")

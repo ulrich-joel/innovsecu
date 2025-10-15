@@ -1,5 +1,8 @@
 """
 train_dynamic_models.py
+=============================================================================================
+ Dynamic Train Model Script
+=============================================================================================
 
 This script is responsible for training dynamic models for anomaly detection and clustering.
 It includes the following steps:
@@ -16,11 +19,14 @@ Dependencies:
 - Joblib for saving and loading models.
 - Config module for project-specific configurations.
 
+=============================================================================================
+
 Outputs:
 - Trained models saved in the `CHECKPOINT_DIR`.
 - Evaluation report saved as a CSV file in the `REPORT_FILE`.
 
 Author: Ngueyep Ulrich
+=============================================================================================
 """
 
 import os
