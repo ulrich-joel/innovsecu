@@ -1,0 +1,33 @@
+# Environnements virtuels
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.log
+
+# VS Code
+.vscode/
+
+# Données
+data/raw/
+data/processed/
+
+# Modèles et checkpoints
+bert_model/
+checkpoints/
+*.safetensors
+*.pt
+
+# Logs
+logs/
+
+# Outputs générés
+outputs/
+output/
+
+# Fichiers spécifiques MITRE (au cas où)
+output/mapped_mittre/*.csv
+output/mapped_mittre/*.json
+outputs/mapped_mittre/*.csv
+outputs/mapped_mittre/*.json
